@@ -1,0 +1,19 @@
+SET
+DELETE 0
+INSERT 0 30000
+=== Synthetic load complete ===
+ ledger_rows 
+-------------
+       30022
+(1 row)
+
+ synthetic_rows 
+----------------
+          30000
+(1 row)
+
+        earliest        |         latest         
+------------------------+------------------------
+ 2023-12-31 23:10:00+00 | 2025-08-22 21:59:43+00
+(1 row)
+

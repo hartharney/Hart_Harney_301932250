@@ -1,0 +1,45 @@
+SET
+psql:/workspace/Hart_Harney_301932250/portfolio-2-query-optimisation/sql/03_index_experiment.sql:7: NOTICE:  index "idx_txn_account_posted_exp" does not exist, skipping
+DROP INDEX
+DROP INDEX
+ANALYZE
+=== BEFORE: EXPLAIN (ANALYZE, BUFFERS) without experimental index ===
+                                                                                                        QUERY PLAN                                                                                                        
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=1015.77..1017.30 rows=613 width=37) (actual time=2.342..2.369 rows=650 loops=1)
+   Sort Key: posted_at
+   Sort Method: quicksort  Memory: 65kB
+   Buffers: shared hit=462
+   ->  Seq Scan on transactions t  (cost=0.00..987.39 rows=613 width=37) (actual time=0.013..2.194 rows=650 loops=1)
+         Filter: ((posted_at >= '2024-02-29 23:00:00+00'::timestamp with time zone) AND (posted_at < '2024-08-31 23:00:00+00'::timestamp with time zone) AND (account_id = '33333333-3333-3333-3333-333333333301'::uuid))
+         Rows Removed by Filter: 29372
+         Buffers: shared hit=462
+ Planning:
+   Buffers: shared hit=64
+ Planning Time: 0.157 ms
+ Execution Time: 2.410 ms
+(12 rows)
+
+=== Create experimental composite index ===
+CREATE INDEX
+ANALYZE
+=== AFTER: EXPLAIN (ANALYZE, BUFFERS) with experimental index ===
+                                                                                                             QUERY PLAN                                                                                                             
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=549.97..551.50 rows=614 width=37) (actual time=0.386..0.412 rows=650 loops=1)
+   Sort Key: posted_at
+   Sort Method: quicksort  Memory: 65kB
+   Buffers: shared hit=189 read=6
+   ->  Bitmap Heap Scan on transactions t  (cost=24.12..521.53 rows=614 width=37) (actual time=0.071..0.246 rows=650 loops=1)
+         Recheck Cond: ((account_id = '33333333-3333-3333-3333-333333333301'::uuid) AND (posted_at >= '2024-02-29 23:00:00+00'::timestamp with time zone) AND (posted_at < '2024-08-31 23:00:00+00'::timestamp with time zone))
+         Heap Blocks: exact=189
+         Buffers: shared hit=189 read=6
+         ->  Bitmap Index Scan on idx_txn_account_posted_exp  (cost=0.00..23.96 rows=614 width=0) (actual time=0.051..0.051 rows=650 loops=1)
+               Index Cond: ((account_id = '33333333-3333-3333-3333-333333333301'::uuid) AND (posted_at >= '2024-02-29 23:00:00+00'::timestamp with time zone) AND (posted_at < '2024-08-31 23:00:00+00'::timestamp with time zone))
+               Buffers: shared read=6
+ Planning:
+   Buffers: shared hit=30 read=1
+ Planning Time: 0.109 ms
+ Execution Time: 0.456 ms
+(15 rows)
+
