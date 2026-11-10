@@ -1,0 +1,83 @@
+SET
+Timing is on.
+DROP INDEX
+Time: 0.899 ms
+NOTICE:  index "idx_transactions_account_posted" does not exist, skipping
+DROP INDEX
+Time: 0.063 ms
+ANALYZE
+Time: 63.246 ms
+=== BEFORE run 1 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 2.268 ms
+=== BEFORE run 2 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 1.909 ms
+=== BEFORE run 3 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 1.788 ms
+=== BEFORE run 4 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 1.775 ms
+=== BEFORE run 5 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 1.842 ms
+CREATE INDEX
+Time: 16.591 ms
+ANALYZE
+Time: 61.194 ms
+=== AFTER run 1 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 0.568 ms
+=== AFTER run 2 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 0.215 ms
+=== AFTER run 3 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 0.201 ms
+=== AFTER run 4 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 0.179 ms
+=== AFTER run 5 ===
+ count 
+-------
+   650
+(1 row)
+
+Time: 0.196 ms

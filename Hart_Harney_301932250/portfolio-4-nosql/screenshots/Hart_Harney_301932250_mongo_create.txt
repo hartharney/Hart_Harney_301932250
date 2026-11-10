@@ -1,0 +1,1 @@
+Created transfer_events with JSON Schema validation and indexes

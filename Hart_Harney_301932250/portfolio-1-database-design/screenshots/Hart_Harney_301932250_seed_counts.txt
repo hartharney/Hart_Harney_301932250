@@ -1,0 +1,10 @@
+      t       | count 
+--------------+-------
+ customers    |    12
+ accounts     |    15
+ transactions |    22
+ transfers    |     4
+ staff        |     6
+ audit_log    |     8
+(6 rows)
+

@@ -1,0 +1,46 @@
+Starting balance for 1002003100: 10000.00
+Mode: locked
+Session A withdraws 3000; Session B withdraws 4000.
+Correct final balance if both apply: 10000 - 3000 - 4000 = 3000
+[B] FOR UPDATE withdraw 4000.00
+SET
+BEGIN
+ balance  
+----------
+ 10000.00
+(1 row)
+
+ pg_sleep 
+----------
+ 
+(1 row)
+
+ balance 
+---------
+ 6000.00
+(1 row)
+
+UPDATE 1
+COMMIT
+[A] FOR UPDATE withdraw 3000.00
+SET
+BEGIN
+ balance 
+---------
+ 6000.00
+(1 row)
+
+ pg_sleep 
+----------
+ 
+(1 row)
+
+ balance 
+---------
+ 3000.00
+(1 row)
+
+UPDATE 1
+COMMIT
+Final balance: 3000.00
+With SELECT FOR UPDATE both withdrawals serialize; final should be 3000.00.

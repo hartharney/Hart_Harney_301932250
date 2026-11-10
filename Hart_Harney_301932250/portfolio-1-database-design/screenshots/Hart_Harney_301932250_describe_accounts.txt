@@ -1,0 +1,29 @@
+                                 Table "lcb.accounts"
+     Column     |           Type           | Collation | Nullable |      Default      
+----------------+--------------------------+-----------+----------+-------------------
+ account_id     | uuid                     |           | not null | gen_random_uuid()
+ account_number | text                     |           | not null | 
+ customer_id    | uuid                     |           | not null | 
+ product_type   | text                     |           | not null | 
+ branch_code    | text                     |           | not null | 
+ currency       | character(3)             |           | not null | 'NGN'::bpchar
+ balance        | numeric(18,2)            |           | not null | 0
+ status         | text                     |           | not null | 
+ opened_by      | uuid                     |           |          | 
+ opened_at      | timestamp with time zone |           | not null | now()
+Indexes:
+    "accounts_pkey" PRIMARY KEY, btree (account_id)
+    "accounts_account_number_key" UNIQUE CONSTRAINT, btree (account_number)
+    "idx_accounts_customer" btree (customer_id)
+Check constraints:
+    "accounts_balance_check" CHECK (balance >= 0::numeric)
+    "accounts_product_type_check" CHECK (product_type = ANY (ARRAY['savings'::text, 'current'::text, 'fixed_deposit'::text]))
+    "accounts_status_check" CHECK (status = ANY (ARRAY['active'::text, 'frozen'::text, 'closed'::text]))
+Foreign-key constraints:
+    "accounts_customer_id_fkey" FOREIGN KEY (customer_id) REFERENCES lcb.customers(customer_id)
+    "accounts_opened_by_fkey" FOREIGN KEY (opened_by) REFERENCES lcb.staff(staff_id)
+Referenced by:
+    TABLE "lcb.transactions" CONSTRAINT "transactions_account_id_fkey" FOREIGN KEY (account_id) REFERENCES lcb.accounts(account_id)
+    TABLE "lcb.transfers" CONSTRAINT "transfers_from_account_id_fkey" FOREIGN KEY (from_account_id) REFERENCES lcb.accounts(account_id)
+    TABLE "lcb.transfers" CONSTRAINT "transfers_to_account_id_fkey" FOREIGN KEY (to_account_id) REFERENCES lcb.accounts(account_id)
+

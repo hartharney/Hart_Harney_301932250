@@ -1,0 +1,11 @@
+            List of relations
+ Schema |     Name     | Type  |  Owner   
+--------+--------------+-------+----------
+ lcb    | accounts     | table | postgres
+ lcb    | audit_log    | table | postgres
+ lcb    | customers    | table | postgres
+ lcb    | staff        | table | postgres
+ lcb    | transactions | table | postgres
+ lcb    | transfers    | table | postgres
+(6 rows)
+

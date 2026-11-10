@@ -1,0 +1,22 @@
+SET
+=== David current balance before failed attempt ===
+ account_number | balance  
+----------------+----------
+ 1002003090     | 33000.00
+(1 row)
+
+BEGIN
+ balance  
+----------
+ 33000.00
+(1 row)
+
+psql:/workspace/Hart_Harney_301932250/portfolio-3-transactions-concurrency/sql/01b_rollback_demo.sql:25: ERROR:  insufficient funds for TRF-P3-FAIL-01: have 33000.00
+CONTEXT:  PL/pgSQL function inline_code_block line 8 at RAISE
+ROLLBACK
+SET
+ account_number | balance  
+----------------+----------
+ 1002003090     | 33000.00
+(1 row)
+

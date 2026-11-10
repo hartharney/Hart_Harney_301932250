@@ -1,0 +1,20 @@
+Replica set: lcbRS
+Members:
+  127.0.0.1:27017 state=PRIMARY
+  127.0.0.1:27018 state=SECONDARY
+  127.0.0.1:27019 state=SECONDARY
+Primary write count: 2
+[
+  {
+    event_id: 'EVT-RS-1',
+    transfer_ref: 'TRF-RS-001',
+    amount: 1500,
+    status: 'posted'
+  },
+  {
+    event_id: 'EVT-RS-2',
+    transfer_ref: 'TRF-RS-002',
+    amount: 2200,
+    status: 'initiated'
+  }
+]

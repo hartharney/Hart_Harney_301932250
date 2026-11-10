@@ -1,0 +1,28 @@
+                                 Table "lcb.transfers"
+     Column      |           Type           | Collation | Nullable |      Default      
+-----------------+--------------------------+-----------+----------+-------------------
+ transfer_id     | uuid                     |           | not null | gen_random_uuid()
+ transfer_ref    | text                     |           | not null | 
+ from_account_id | uuid                     |           | not null | 
+ to_account_id   | uuid                     |           | not null | 
+ amount          | numeric(18,2)            |           | not null | 
+ status          | text                     |           | not null | 
+ initiated_by    | uuid                     |           |          | 
+ failure_reason  | text                     |           |          | 
+ requested_at    | timestamp with time zone |           | not null | now()
+ completed_at    | timestamp with time zone |           |          | 
+Indexes:
+    "transfers_pkey" PRIMARY KEY, btree (transfer_id)
+    "idx_transfers_status" btree (status)
+    "transfers_transfer_ref_key" UNIQUE CONSTRAINT, btree (transfer_ref)
+Check constraints:
+    "transfers_amount_check" CHECK (amount > 0::numeric)
+    "transfers_distinct_accounts" CHECK (from_account_id <> to_account_id)
+    "transfers_status_check" CHECK (status = ANY (ARRAY['initiated'::text, 'posted'::text, 'failed'::text, 'reversed'::text]))
+Foreign-key constraints:
+    "transfers_from_account_id_fkey" FOREIGN KEY (from_account_id) REFERENCES lcb.accounts(account_id)
+    "transfers_initiated_by_fkey" FOREIGN KEY (initiated_by) REFERENCES lcb.staff(staff_id)
+    "transfers_to_account_id_fkey" FOREIGN KEY (to_account_id) REFERENCES lcb.accounts(account_id)
+Referenced by:
+    TABLE "lcb.transactions" CONSTRAINT "transactions_transfer_id_fkey" FOREIGN KEY (transfer_id) REFERENCES lcb.transfers(transfer_id)
+

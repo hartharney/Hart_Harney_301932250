@@ -1,0 +1,38 @@
+# Local LMS / brief materials — never commit
+_context/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Database dumps and backups
+*.dump
+*.sql.gz
+*.backup
+pgdata/
+mongo-data/
+**/data/db/
+**/dump/
+
+# Docker volumes / local runtime
+**/docker-volumes/
+**/.docker/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.log
+
+# Python / Node leftovers
+__pycache__/
+*.pyc
+node_modules/
+.venv/
