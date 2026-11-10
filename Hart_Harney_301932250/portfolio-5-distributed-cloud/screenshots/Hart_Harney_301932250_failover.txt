@@ -1,0 +1,36 @@
+=== Replica status BEFORE stepDown ===
+127.0.0.1:27017 PRIMARY
+127.0.0.1:27018 SECONDARY
+127.0.0.1:27019 SECONDARY
+Current PRIMARY port: 27017
+=== Write with majority writeConcern on primary ===
+{
+  acknowledged: true,
+  insertedId: ObjectId('6af2ff504b55df06239c0061')
+}
+=== Step down primary (force election) ===
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1794309968, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1794309968, i: 1 })
+}
+=== Waiting for new PRIMARY ===
+poll 1: 127.0.0.1:27017:SECONDARY, 127.0.0.1:27018:PRIMARY, 127.0.0.1:27019:SECONDARY
+=== Replica status AFTER election ===
+127.0.0.1:27017 SECONDARY health=1
+127.0.0.1:27018 PRIMARY health=1
+127.0.0.1:27019 SECONDARY health=1
+New PRIMARY port: 27018
+=== Write resumes on current primary ===
+{
+  acknowledged: true,
+  insertedId: ObjectId('6af2ff5277d5aea023d9c3e9')
+}
+count=4
+Failover demo complete.

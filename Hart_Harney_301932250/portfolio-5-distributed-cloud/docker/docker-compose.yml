@@ -1,46 +1,31 @@
 # Lagos Community Bank — Portfolio 5 MongoDB 3-member replica set
+# Prefer this Compose file when Docker bridge networking allows member-to-member
+# traffic. This environment also ships scripts/05_run_host_replica.sh which runs
+# the same topology on 127.0.0.1:27017-27019 (used for the captured failover evidence).
 services:
   mongo1:
     image: mongo:7
     container_name: lcb-mongo1
-    command: ["mongod", "--replSet", "lcbRS", "--bind_ip_all", "--port", "27017"]
-    ports:
-      - "27017:27017"
+    network_mode: host
+    command: ["mongod", "--replSet", "lcbRS", "--bind_ip", "127.0.0.1", "--port", "27017"]
     volumes:
       - mongo1_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 }).ok"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
 
   mongo2:
     image: mongo:7
     container_name: lcb-mongo2
-    command: ["mongod", "--replSet", "lcbRS", "--bind_ip_all", "--port", "27017"]
-    ports:
-      - "27018:27017"
+    network_mode: host
+    command: ["mongod", "--replSet", "lcbRS", "--bind_ip", "127.0.0.1", "--port", "27018"]
     volumes:
       - mongo2_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 }).ok"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
 
   mongo3:
     image: mongo:7
     container_name: lcb-mongo3
-    command: ["mongod", "--replSet", "lcbRS", "--bind_ip_all", "--port", "27017"]
-    ports:
-      - "27019:27017"
+    network_mode: host
+    command: ["mongod", "--replSet", "lcbRS", "--bind_ip", "127.0.0.1", "--port", "27019"]
     volumes:
       - mongo3_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 }).ok"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
 
 volumes:
   mongo1_data:

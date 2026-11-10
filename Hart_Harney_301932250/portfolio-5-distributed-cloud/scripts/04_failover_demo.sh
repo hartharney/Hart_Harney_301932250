@@ -7,14 +7,23 @@ OUT="$SS/Hart_Harney_301932250_failover.txt"
 
 log() { echo -e "$*" | tee -a "$OUT"; }
 
-log "=== Replica status BEFORE stepDown ==="
-docker exec lcb-mongo1 mongosh --quiet --eval 'rs.status().members.forEach(m => print(m.name + " " + m.stateStr))' | tee -a "$OUT"
+primary_port() {
+  for p in 27017 27018 27019; do
+    if mongosh --port "$p" --quiet --eval 'db.isMaster().ismaster' 2>/dev/null | grep -q true; then
+      echo "$p"
+      return
+    fi
+  done
+  echo ""
+}
 
-PRIMARY=$(docker exec lcb-mongo1 mongosh --quiet --eval 'rs.status().members.find(m => m.stateStr==="PRIMARY").name' | tr -d '\r')
-log "Current PRIMARY: $PRIMARY"
+log "=== Replica status BEFORE stepDown ==="
+mongosh --port 27017 --quiet --eval 'rs.status().members.forEach(m => print(m.name + " " + m.stateStr))' | tee -a "$OUT"
+PPORT=$(primary_port)
+log "Current PRIMARY port: $PPORT"
 
 log "=== Write with majority writeConcern on primary ==="
-docker exec lcb-mongo1 mongosh --quiet --eval '
+mongosh --port "$PPORT" --quiet --eval '
 db = db.getSiblingDB("lagos_community_bank");
 const r = db.transfer_events.insertOne({
   event_id: "EVT-RS-BEFORE-FAILOVER",
@@ -31,11 +40,11 @@ printjson(r);
 ' | tee -a "$OUT"
 
 log "=== Step down primary (force election) ==="
-docker exec lcb-mongo1 mongosh --quiet --eval 'try { rs.stepDown(60); } catch(e) { print(e); }' | tee -a "$OUT" || true
+mongosh --port "$PPORT" --quiet --eval 'try { rs.stepDown(60); } catch(e) { print(String(e)); }' | tee -a "$OUT" || true
 
 log "=== Waiting for new PRIMARY ==="
 for i in $(seq 1 30); do
-  STATE=$(docker exec lcb-mongo1 mongosh --quiet --eval 'rs.status().members.map(m => m.name+":"+m.stateStr).join(", ")' 2>/dev/null || echo 'unavailable')
+  STATE=$(mongosh --port 27018 --quiet --eval 'rs.status().members.map(m => m.name+":"+m.stateStr).join(", ")' 2>/dev/null || echo unavailable)
   log "poll $i: $STATE"
   if echo "$STATE" | grep -q PRIMARY; then
     break
@@ -44,26 +53,13 @@ for i in $(seq 1 30); do
 done
 
 log "=== Replica status AFTER election ==="
-docker exec lcb-mongo2 mongosh --quiet --eval 'rs.status().members.forEach(m => print(m.name + " " + m.stateStr + " health=" + m.health))' | tee -a "$OUT" || \
-docker exec lcb-mongo1 mongosh --quiet --eval 'rs.status().members.forEach(m => print(m.name + " " + m.stateStr + " health=" + m.health))' | tee -a "$OUT"
+mongosh --port 27018 --quiet --eval 'rs.status().members.forEach(m => print(m.name + " " + m.stateStr + " health=" + m.health))' | tee -a "$OUT"
+
+NEW=$(primary_port)
+log "New PRIMARY port: $NEW"
 
 log "=== Write resumes on current primary ==="
-# Discover primary container
-NEW_PRIMARY_HOST=$(docker exec lcb-mongo1 mongosh --quiet --eval 'const p=rs.status().members.find(m=>m.stateStr==="PRIMARY"); print(p?p.name:"none")' 2>/dev/null | tr -d '\r' || true)
-if [[ -z "${NEW_PRIMARY_HOST}" || "${NEW_PRIMARY_HOST}" == "none" ]]; then
-  NEW_PRIMARY_HOST=$(docker exec lcb-mongo2 mongosh --quiet --eval 'const p=rs.status().members.find(m=>m.stateStr==="PRIMARY"); print(p?p.name:"none")' | tr -d '\r')
-fi
-log "New PRIMARY host: $NEW_PRIMARY_HOST"
-PRIMARY_CONTAINER=$(echo "$NEW_PRIMARY_HOST" | cut -d: -f1 | sed 's/mongo/lcb-mongo/')
-# mongo1 -> lcb-mongo1 mapping
-case "$NEW_PRIMARY_HOST" in
-  mongo1:*) PRIMARY_CONTAINER=lcb-mongo1 ;;
-  mongo2:*) PRIMARY_CONTAINER=lcb-mongo2 ;;
-  mongo3:*) PRIMARY_CONTAINER=lcb-mongo3 ;;
-esac
-log "Using container: $PRIMARY_CONTAINER"
-
-docker exec "$PRIMARY_CONTAINER" mongosh --quiet --eval '
+mongosh --port "$NEW" --quiet --eval '
 db = db.getSiblingDB("lagos_community_bank");
 const r = db.transfer_events.insertOne({
   event_id: "EVT-RS-AFTER-FAILOVER",
