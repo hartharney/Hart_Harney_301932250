@@ -1,0 +1,20 @@
+SET
+=== TEST 1: duplicate account_number (UNIQUE) ===
+psql:/workspace/Hart_Harney_301932250/portfolio-1-database-design/sql/03_constraint_tests.sql:12: ERROR:  duplicate key value violates unique constraint "accounts_account_number_key"
+DETAIL:  Key (account_number)=(1002003001) already exists.
+=== TEST 2: negative balance (CHECK) ===
+psql:/workspace/Hart_Harney_301932250/portfolio-1-database-design/sql/03_constraint_tests.sql:20: ERROR:  new row for relation "accounts" violates check constraint "accounts_balance_check"
+DETAIL:  Failing row contains (c1ae492a-0481-45e4-b5c7-772451594f08, 1002999999, 22222222-2222-2222-2222-222222222201, savings, VI, NGN, -10.00, active, null, 2026-11-10 11:20:07.593451+00).
+=== TEST 3: transfer amount <= 0 (CHECK) ===
+psql:/workspace/Hart_Harney_301932250/portfolio-1-database-design/sql/03_constraint_tests.sql:30: ERROR:  new row for relation "transfers" violates check constraint "transfers_amount_check"
+DETAIL:  Failing row contains (59d9b041-99ed-4b86-83ea-c948ea2b1f72, TRF-BAD-AMT, 33333333-3333-3333-3333-333333333301, 33333333-3333-3333-3333-333333333302, 0.00, initiated, null, null, 2026-11-10 11:20:07.593587+00, null).
+=== TEST 4: same from/to account (CHECK) ===
+psql:/workspace/Hart_Harney_301932250/portfolio-1-database-design/sql/03_constraint_tests.sql:40: ERROR:  new row for relation "transfers" violates check constraint "transfers_distinct_accounts"
+DETAIL:  Failing row contains (355d0cf4-46da-4891-9117-860c1b2f9bb0, TRF-BAD-SAME, 33333333-3333-3333-3333-333333333301, 33333333-3333-3333-3333-333333333301, 100.00, initiated, null, null, 2026-11-10 11:20:07.593729+00, null).
+=== TEST 5: invalid FK customer_id ===
+psql:/workspace/Hart_Harney_301932250/portfolio-1-database-design/sql/03_constraint_tests.sql:48: ERROR:  insert or update on table "accounts" violates foreign key constraint "accounts_customer_id_fkey"
+DETAIL:  Key (customer_id)=(99999999-9999-9999-9999-999999999999) is not present in table "customers".
+=== TEST 6: invalid kyc_status ===
+psql:/workspace/Hart_Harney_301932250/portfolio-1-database-design/sql/03_constraint_tests.sql:54: ERROR:  new row for relation "customers" violates check constraint "customers_kyc_status_check"
+DETAIL:  Failing row contains (3dd70930-b9c3-4ab6-8fba-d3217b4e15d7, CUS-BAD, Bad, Status, bad@example.com, +2348099999999, x, unknown, 2026-11-10 11:20:07.59415+00).
+=== All constraint tests attempted ===
