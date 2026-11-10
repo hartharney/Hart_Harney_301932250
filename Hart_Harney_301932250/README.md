@@ -33,7 +33,7 @@ demonstrates a live three-member MongoDB replica set with controlled failover.
 ## Final documentation
 
 - [Hart_Harney_301932250_FinalSummary.md](Hart_Harney_301932250_FinalSummary.md)
-- PDF export (added with final docs)
+- [Hart_Harney_301932250_FinalSummary.pdf](Hart_Harney_301932250_FinalSummary.pdf)
 
 ## How to run (high level)
 
