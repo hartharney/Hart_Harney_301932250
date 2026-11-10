@@ -1,0 +1,109 @@
+=== Q1: Full lifecycle for TRF-1001 ===
+[
+  {
+    _id: ObjectId('6af2fe87ffd04d1b9505a1ef'),
+    event_id: 'EVT-1001-INIT',
+    transfer_ref: 'TRF-1001',
+    from_account: '1002003010',
+    to_account: '1002003001',
+    amount: 25000,
+    currency: 'NGN',
+    status: 'initiated',
+    channel: 'branch',
+    initiated_by: 'STF-001',
+    metadata: {
+      branch: 'VI',
+      customer_note: 'Rent support'
+    },
+    occurred_at: ISODate('2025-10-08T08:00:00.000Z')
+  },
+  {
+    _id: ObjectId('6af2fe87ffd04d1b9505a1f0'),
+    event_id: 'EVT-1001-POST',
+    transfer_ref: 'TRF-1001',
+    from_account: '1002003010',
+    to_account: '1002003001',
+    amount: 25000,
+    currency: 'NGN',
+    status: 'posted',
+    channel: 'branch',
+    initiated_by: 'STF-001',
+    metadata: {
+      ledger_refs: [
+        'TRF-1001-DR',
+        'TRF-1001-CR'
+      ]
+    },
+    occurred_at: ISODate('2025-10-08T08:00:01.000Z')
+  }
+]
+=== Q2: Failed events with reasons ===
+[
+  {
+    transfer_ref: 'TRF-1004',
+    amount: 5000,
+    failure_reason: 'destination KYC review hold',
+    occurred_at: ISODate('2025-10-11T11:00:02.000Z')
+  }
+]
+=== Q3: Posted volume by channel ===
+[
+  {
+    _id: 'branch',
+    count: 1,
+    total_amount: 25000
+  },
+  {
+    _id: 'mobile',
+    count: 1,
+    total_amount: 12000
+  },
+  {
+    _id: 'ussd',
+    count: 1,
+    total_amount: 8000
+  },
+  {
+    _id: 'api',
+    count: 1,
+    total_amount: 7500
+  }
+]
+=== Q4: Latest event per transfer_ref ===
+[
+  {
+    _id: 'TRF-1001',
+    latest_status: 'posted',
+    amount: 25000,
+    occurred_at: ISODate('2025-10-08T08:00:01.000Z'),
+    channel: 'branch'
+  },
+  {
+    _id: 'TRF-1002',
+    latest_status: 'posted',
+    amount: 12000,
+    occurred_at: ISODate('2025-10-09T09:15:01.000Z'),
+    channel: 'mobile'
+  },
+  {
+    _id: 'TRF-1003',
+    latest_status: 'posted',
+    amount: 8000,
+    occurred_at: ISODate('2025-10-10T07:40:01.000Z'),
+    channel: 'ussd'
+  },
+  {
+    _id: 'TRF-1004',
+    latest_status: 'failed',
+    amount: 5000,
+    occurred_at: ISODate('2025-10-11T11:00:02.000Z'),
+    channel: 'branch'
+  },
+  {
+    _id: 'TRF-P3-OK-01',
+    latest_status: 'posted',
+    amount: 7500,
+    occurred_at: ISODate('2025-11-10T11:00:01.000Z'),
+    channel: 'api'
+  }
+]

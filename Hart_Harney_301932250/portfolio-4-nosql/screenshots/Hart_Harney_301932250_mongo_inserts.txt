@@ -1,0 +1,3 @@
+Inserted 10 transfer_events
+=== Validation failure demo (amount 0) ===
+Expected validation error: Document failed validation

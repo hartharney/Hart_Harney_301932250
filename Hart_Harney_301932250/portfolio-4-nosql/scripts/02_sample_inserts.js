@@ -136,7 +136,7 @@ const docs = [
 ];
 
 const result = db.transfer_events.insertMany(docs);
-print(`Inserted ${result.insertedIds.length} transfer_events`);
+print(`Inserted ${Object.keys(result.insertedIds).length} transfer_events`);
 
 print('=== Validation failure demo (amount 0) ===');
 try {
