@@ -1,0 +1,29 @@
+SET
+=== Balances BEFORE successful transfer ===
+ account_number | balance  
+----------------+----------
+ 1002003002     | 85000.00
+ 1002003040     | 67000.00
+(2 rows)
+
+BEGIN
+              account_id              | balance  
+--------------------------------------+----------
+ 33333333-3333-3333-3333-333333333302 | 85000.00
+ 33333333-3333-3333-3333-333333333307 | 67000.00
+(2 rows)
+
+DO
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+INSERT 0 1
+INSERT 0 1
+COMMIT
+=== Balances AFTER successful transfer ===
+ account_number | balance  
+----------------+----------
+ 1002003002     | 77500.00
+ 1002003040     | 74500.00
+(2 rows)
+

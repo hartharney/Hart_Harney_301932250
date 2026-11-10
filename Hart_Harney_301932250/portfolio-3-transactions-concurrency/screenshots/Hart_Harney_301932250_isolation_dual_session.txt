@@ -1,0 +1,45 @@
+===== SESSION A =====
+SET
+SET
+[A] BEGIN and read Musa savings balance
+BEGIN
+ account_number | balance  
+----------------+----------
+ 1002003011     | 45000.00
+(1 row)
+
+[A] Sleeping 5s while Session B updates and commits...
+ pg_sleep 
+----------
+ 
+(1 row)
+
+[A] Re-read same row inside still-open transaction (READ COMMITTED sees B commit)
+ account_number | balance  
+----------------+----------
+ 1002003011     | 46000.00
+(1 row)
+
+COMMIT
+[A] COMMIT done
+
+===== SESSION B =====
+SET
+SET
+[B] Waiting 1s so Session A starts first
+ pg_sleep 
+----------
+ 
+(1 row)
+
+[B] BEGIN update Musa savings (+1000 deposit)
+BEGIN
+ account_number | balance  
+----------------+----------
+ 1002003011     | 46000.00
+(1 row)
+
+UPDATE 1
+INSERT 0 1
+COMMIT
+[B] COMMIT finished — Session A should now see 46000 on re-read

@@ -1,0 +1,10 @@
+Starting balance for 1002003100: 10000.00
+Mode: unlocked
+Session A withdraws 3000; Session B withdraws 4000.
+Correct final balance if both apply: 10000 - 3000 - 4000 = 3000
+[B] READ balance=10000.00 (no lock)
+[A] READ balance=10000.00 (no lock)
+[A] WRITE balance=7000.00 after withdrawing 3000.00
+[B] WRITE balance=6000.00 after withdrawing 4000.00
+Final balance: 6000.00
+Expected anomaly without locking: one withdrawal is lost (final often 6000 or 7000).
